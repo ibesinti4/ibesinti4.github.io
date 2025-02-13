@@ -14,7 +14,7 @@ let mic;
         mic.start();// activa el microfon
 }
 function draw() {
-  let vol=mic.getlevel();
+  let vol=mic.getLevel();
   let h=map(vol,0,1,0,400);
   background("orange");
   fill(218,255,51)
