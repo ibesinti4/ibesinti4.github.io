@@ -16,7 +16,7 @@ let mic;
 function draw() {
   let vol=mic.getLevel();
   let h=map(vol,0,1,0,400);
-  background("orange");
+  background("white");
   fill(218-h,255+h,51)
   ellipse(windowWidth/2,windowHeight/2,300,300);
   fill(1, 1, 1 )
