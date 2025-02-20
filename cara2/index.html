@@ -19,7 +19,7 @@ function draw() {
   let vol=mic.getLevel();
   let h=map(vol,0,1,0,400);
   background(71, 220, 83 );//color de fons
-  fill(218-h,255+h,51-h);//color de cara
+  fill(218+h*2,255+h,51-h);//color de cara
   ellipse(windowWidth/2,windowHeight/2,300+temblar,300+temblar);//cara
   // el primer que hi ha entre parentesis es diu paràmatre i és la posicó x del centre de la cara 
   //windowWid/2significa que el centre de la cara coincideix amb el centre de la pantallla 
@@ -28,11 +28,12 @@ function draw() {
   //el tercer paràmetre es la amplada de la cara 
   //el cuart es la alçada de la cara 
   //temblar esta sumat a l'amplada i l'alçads de la cara i canviara aleotoriament entre 10 i 50 pixels
-  fill(1, 1, 1 )//color ulls
+  fill(1+h*2, 1, 1 )//color ulls
   ellipse(windowWidth/2-60,windowHeight/2-60,70,70);//ull dret
   ellipse(windowWidth/2+60,windowHeight/2-60,70,70);//ull esquerra
   arc(windowWidth/2,windowHeight/2+90,100,90+h,0,PI);//boca
 }
+      console.log(h);
     </script>
 </body>
 </html>
