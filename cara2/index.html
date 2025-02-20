@@ -18,7 +18,7 @@ function draw() {
   temblar=random(10,50)
   let vol=mic.getLevel();
   let h=map(vol,0,1,0,400);
-  background(71, 220, 83);//color de fons
+  background(71+h*2, 220-h*2, 83+h);//color de fons
   fill( 217, 190+h, 150);//color de cara);
   stroke(0,0,0)//;
   ellipse(windowWidth/2,windowHeight/2,300+temblar,300+temblar);//cara
@@ -32,7 +32,7 @@ function draw() {
   fill(1+h*4, 1, 1 )//color ulls
   ellipse(windowWidth/2-60,windowHeight/2-60,70+h*2,70+2+h*2);//ull dret
   ellipse(windowWidth/2+60,windowHeight/2-60,70,70+h*2+h*2);//ull esquerra
-  arc(windowWidth/2,windowHeight/2+90,100,90+h*4,0,PI;//boca
+  arc(windowWidth/2,windowHeight/2+90,100,90+h,0,PI;//boca
  console.log(h); 
 }
     </script>
