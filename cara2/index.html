@@ -15,10 +15,10 @@ let mic;
         mic.start();// activa el microfon
 }
 function draw() {
-  temlar=random(10,50)
+  temblar=random(10,50)
   let vol=mic.getLevel();
   let h=map(vol,0,1,0,400);
-  background(71, 220, 83 );//color de fons
+  background(71, 220, 83);//color de fons
   fill( 217, 190+h, 150);//color de cara);
   stroke(255,0,0);
   ellipse(windowWidth/2,windowHeight/2,300+temblar,300+temblar);//cara
