@@ -30,8 +30,8 @@ function draw() {
   //el cuart es la alçada de la cara 
   //temblar esta sumat a l'amplada i l'alçads de la cara i canviara aleotoriament entre 10 i 50 pixels
   fill(1+h*4, 1, 1 )//color ulls
-  ellipse(windowWidth/2-60,windowHeight/2-60,70+h*2,70+2+h*2);//ull dret
-  ellipse(windowWidth/2+60,windowHeight/2-60,70,70+h*2+h*2);//ull esquerra
+  ellipse(windowWidth/2-60,windowHeight/2-60,70+h*2+temblar,70+2+h*2+temblar);//ull dret
+  ellipse(windowWidth/2+60,windowHeight/2-60,70+h*2+temblar,70+h*2+temblar);//ull esquerra
   arc(windowWidth/2,windowHeight/2+90,100,90+h,0,PI);//boca
  console.log(h); 
 }
