@@ -32,15 +32,18 @@ function draw() {
   fill(0); // Color negro
         rectMode(CENTER);
         rect(windowWidth /2,windowHeight / 2 - 150 , 180, 80); // Part superior
+  fill(255,0,0)
         rect(windowWidth /2,windowHeight / 2 - 110 , 250, 20); // Ala del sombreix
   fill(255+h*4, 255, 255)//color ulls
   ellipse(windowWidth/2-60,windowHeight/2-60,70,70);//ull dret
   ellipse(windowWidth/2+60,windowHeight/2-60,70,70);//ull esquerra
   fill(1,1,1)
   arc(windowWidth/2,windowHeight/2+90,100,90+h*6,0,PI);//boca
-  fill(1+h*4, 1, 1 )//colos de pupil·la
+  fill(1+h*4, 1, 1 )//colors de pupil·la
   ellipse(windowWidth/2-60,windowHeight/2-60,20,20);//PUPILA dret
   ellipse(windowWidth/2+60,windowHeight/2-60,20,20);//PUPILA esquerra
+  fill(0)
+  eliipse(windoewidth/2-60,windowheight/2-80,20,20);//nas
  console.log(h); 
 }
     </script>
