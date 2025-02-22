@@ -29,6 +29,10 @@ function draw() {
   //el tercer paràmetre es la amplada de la cara 
   //el cuart es la alçada de la cara 
   //temblar esta sumat a l'amplada i l'alçads de la cara i canviara aleotoriament entre 10 i 50 pixels
+  fill(0); // Color negro
+        rectMode(CENTER);
+        rect(windowWidth / 2 + , windowHeight / 2 - 150 + temblar, 180, 80); // Part superior
+        rect(windowWidth / 2 + , windowHeight / 2 - 110 + temblar, 250, 20); // Ala del sombreix
   fill(255+h*4, 255, 255)//color ulls
   ellipse(windowWidth/2-60,windowHeight/2-60,70,70);//ull dret
   ellipse(windowWidth/2+60,windowHeight/2-60,70,70);//ull esquerra
