@@ -25,7 +25,7 @@ function draw() {
   background(71+h*4, 220+h*4, 83-h);//color de fons
   fill( 217, 190+h, 150);//color de cara);
   stroke(0,0,0)//;
-  ellipse(windowWidth/2,windowHeight/2,250,300);//cara
+  ellipse(windowWidth/2,windowHeight/2,250,300+movsinus);//cara
   // el primer que hi ha entre parentesis es diu paràmatre i és la posicó x del centre de la cara 
   //windowWid/2significa que el centre de la cara coincideix amb el centre de la pantallla 
   //el segon paràmtre és la posició y o alçada
@@ -35,7 +35,7 @@ function draw() {
   //temblar esta sumat a l'amplada i l'alçads de la cara i canviara aleotoriament entre 10 i 50 pixels
   fill(0); // Color negro
         rectMode(CENTER);
-        rect(windowWidth /2,windowHeight / 2 - 150 , 180, 80+movsinus); // Part superior
+        rect(windowWidth /2,windowHeight / 2 - 150 , 180, 80); // Part superior
   fill(255,0,0)
         rect(windowWidth /2,windowHeight / 2 - 110 , 250, 20); // Ala del sombreix
   fill(255+h*4, 255, 255)//color ulls
