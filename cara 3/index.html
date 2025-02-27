@@ -15,12 +15,11 @@ let mic;
 }
 function draw() {
   temblar=random(10,50)
-  sinus=(sin(frameCount * 0.1);//la variable sinus crea numeros entre -1 i +1
-  //frameCount esta contat els fotogrames i fa 60 sinua per segon
+  sinus=sin(frameCount * 0.1);//la variable sinus crea numeros entre -1 i +1
+  //frameCount esta contant els fotogrames i fa 60 a sinus per segon
   //això vol dir 60 numeros entre -1 i 1 ordenats per segon
-  let movsinus=map(sinus,-1,1,0,50);
-  //convrteix els numeros entre - 1 i +1 donaran numeros proporcionals
-  //entre 0 i 50
+  let movsinus=map(sinus,-1,1,0,255);
+  //converteix els numeros entre -1 i +1 donaran numeros proporcionals
   let vol=mic.getLevel();
   let h=map(vol,0,1,0,400);
   background(71+h*4, 220+h*4, 83-h);//color de fons
