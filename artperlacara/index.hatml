@@ -1,0 +1,17 @@
+<¡DOCTYPE html > 
+  <¡--indica que el document es HTML5-->
+    <html< 
+      <head> 
+    <¡--La secció head conté metadades i enllaços a fitxers externs-->
+      <meta charset="UTF-8>
+        <¡--Defineix la codificació de caràcters a UTF-8 ,que suporta accents i simbols especials-->
+        <title> Art Geometric amb Mini Cara i Text Gran</title>
+        <¡--Defineix el títol de la pagina que apareixerà a la pestanya del navegador-->
+        <¡--Llibreries neccesaries s'inclouen des de servodors externs-->
+  <¡--script src=https://"cdnjs.cloudflare.com/Ajax/libs/p5.js/1.11.3/p5.js">>/script>
+  
+ <¡--Aquesta es la biblioteca p5.js ,que facilita la creació de grafics i animacions en el navegador-->
+  <script src =" https:¨//cdn.jsdelivr.net/gh/ml5js/Intro-ml-arts-IMA@ml5-build-10-7-19/ml5_build/ml5.min.js<>/script>
+  <¡--Aquesta es la boblioteca ml5.js,que ens permet utilitzar models d'intel·ligencia artficial com la detecció facial-->
+  
+  
