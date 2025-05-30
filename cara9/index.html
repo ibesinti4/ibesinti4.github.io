@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.2/p5.min.js"></script>
@@ -6,64 +6,69 @@
 </head>
 <body>
   <button onclick="changeBackground();">Canvia Fons</button>
-
   <script>
     let mic;
     let smile = false;
     let bgColor;
     let t = 0;
     let mosquits = [];
-
+    // Variables per parpelleig
+    let isBlinking = false;
+    let blinkStartFrame = 0;
+    let blinkDuration = 5; // quants frames duren els ulls tancats
+    let nextBlinkFrame = 0;
     function setup() {
       createCanvas(windowWidth, windowHeight);
       mic = new p5.AudioIn();
       mic.start();
       bgColor = color(200, 220, 255);
-
-      // Crear múltiples mosquitos
+      // Crear múltiples mosquits
       for (let i = 0; i < 10; i++) {
         mosquits.push({
           xOffset: random(1000),
           yOffset: random(1000)
         });
       }
+      scheduleNextBlink();
     }
-
     function draw() {
       t += 0.01;
       let temblar = random(10, 50);
-      let sinus = sin(frameCount * 0.1);
-      let movsinus = map(sinus, -1, 1, 0, 255);
-      let blink = map(sin(frameCount * 0.2), -1, 1, 20, 70); // Parpadeo animado
-
       let vol = mic.getLevel();
       let h = map(vol, 0, 1, 0, 400);
-
       background(bgColor);
-
+      // Gestió del parpelleig aleatori
+      if (!isBlinking && frameCount >= nextBlinkFrame) {
+        isBlinking = true;
+        blinkStartFrame = frameCount;
+      }
+      if (isBlinking && frameCount > blinkStartFrame + blinkDuration) {
+        isBlinking = false;
+        scheduleNextBlink(); // Programa el següent parpelleig
+      }
+      // Obertura d'ulls segons estat
+      let eyeHeight = isBlinking ? 0 : 70;
       // CARA
       fill(217, 190 + h, 150);
       stroke(0);
-      ellipse(width / 2, height / 2, 250 + movsinus, 300);
-
+      ellipse(width / 2, height / 2, 250 + temblar, 300);
       // BARRET
       fill(0);
       rectMode(CENTER);
       rect(width / 2, height / 2 - 150, 180, 80);
       fill(255, 0, 0);
       rect(width / 2, height / 2 - 110, 250, 20);
-
-      // ULLS que parpadean
+      // ULLS (parpelleig aleatori)
       fill(255 + h * 4, 255, 255);
-      ellipse(width / 2 - 60, height / 2 - 60, 70, blink); // ull dret
-      ellipse(width / 2 + 60, height / 2 - 60, 70, blink); // ull esquerre
-
-      // PUPIL·LES
-      fill(1 + h * 4, 1, 1);
-      ellipse(width / 2 - 60, height / 2 - 60, 20, 20);
-      ellipse(width / 2 + 60, height / 2 - 60, 20, 20);
-
-      // BOCA 
+      ellipse(width / 2 - 60, height / 2 - 60, 70, eyeHeight);
+      ellipse(width / 2 + 60, height / 2 - 60, 70, eyeHeight);
+      // PUPIL·LES només si els ulls estan oberts
+      if (eyeHeight > 0) {
+        fill(1 + h * 4, 1, 1);
+        ellipse(width / 2 - 60, height / 2 - 60, 20, 20);
+        ellipse(width / 2 + 60, height / 2 - 60, 20, 20);
+      }
+      // BOCA
       fill(0);
       noStroke();
       if (smile) {
@@ -71,32 +76,28 @@
       } else {
         arc(width / 2, height / 2 + 110, 100, 90 + h * 6, PI, 0);
       }
-
       // MOSQUITS
       for (let i = 0; i < mosquits.length; i++) {
         let m = mosquits[i];
         let x = noise(m.xOffset + t) * width;
         let y = noise(m.yOffset + t) * height;
-
-        // Ales
         fill(255);
         ellipse(x + 10, y - 10, 15, 15);
         ellipse(x - 10, y + 10, 15, 15);
-
-        // Cos
         fill(30, 12, 200);
         ellipse(x, y, 30, 20);
       }
     }
-
     function keyPressed() {
       if (key === 'S' || key === 's') {
         smile = !smile;
       }
     }
-
     function changeBackground() {
       bgColor = color(random(100, 255), random(100, 255), random(100, 255));
+    }
+    function scheduleNextBlink() {
+      nextBlinkFrame = frameCount + int(random(60, 300)); // entre 1 i 5 segons
     }
   </script>
 </body>
