@@ -49,7 +49,9 @@
     let smoothIntensity = 0;
     let currentGradientStart, currentGradientEnd;
     let targetGradientStart, targetGradientEnd;
-
+  
+    
+    function rawVideoPreview;
     function getGradientForEmotion(emotion) {
       switch (emotion) {
         case 'happy':      return { start: color(255, 223, 186), end: color(255, 183, 77) };
@@ -299,7 +301,7 @@
             Error de càmera!<br>
             Permet l'accés a la càmera i actualitza.
             
-            function drawVideoPreview() {
+         function drawVideoPreview() {
         // Aquesta funció dibuixa una petita previsualització del vídeo de la càmera a la cantonada inferior dreta.
         const previewSize = min(width, height) * 0.15;
         // Calcula la mida de la previsualització com el 15% de la mida mínima (entre amplada i alçada) de la finestra.
