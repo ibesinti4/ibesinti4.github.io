@@ -357,13 +357,7 @@
         // Per defecte, no omple les formes tret que s'indiqui.
 
         // Utilitza un "switch" per determinar quina forma dibuixar segons l'expressió dominant.
-        switch (dominant) {      
-      text("Intensitat: " + Math.round(intensity * 100)+"%",width /2+100,10);
-      // Mostra el vídeo si hi ha detecció
-      if (detections.length > 0) {
-        image(video, width - 140, height - 140, 120, 120);
-      }
-    }
+        switch (dominant) {     
 
           case 'happy':
             // Cas per a l'emoció "happy" (feliç)
