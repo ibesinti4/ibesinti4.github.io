@@ -298,6 +298,19 @@
           <p style="color: red; text-align: center">
             Error de càmera!<br>
             Permet l'accés a la càmera i actualitza.
+            
+            function drawVideoPreview() {
+        // Aquesta funció dibuixa una petita previsualització del vídeo de la càmera a la cantonada inferior dreta.
+        const previewSize = min(width, height) * 0.15;
+        // Calcula la mida de la previsualització com el 15% de la mida mínima (entre amplada i alçada) de la finestra.
+        image(
+          video,
+          width - previewSize - 10,  /* Coordenada X: col·loca la imatge a la dreta, deixant un marge de 10 píxels */
+          height - previewSize - 10, /* Coordenada Y: col·loca la imatge a la part inferior amb un marge de 10 píxels */
+          previewSize,               /* Amplada de la previsualització */
+          previewSize                /* Alçada de la previsualització */
+        );
+      }
           </p>
         `;
       });
