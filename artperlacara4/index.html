@@ -213,20 +213,24 @@
           fill(0); ellipse(-10, -140, 12, 8); ellipse(25, -140, 12, 8);
           break;
         case 'angry':
-          // Boca enfadada
-          noFill();
-          stroke(strokeCol); strokeWeight(4);
-          arc(7, -100, 40, 25, PI + QUARTER_PI, TWO_PI - QUARTER_PI);
-          // Ojos fruncidos
-          fill(0);
-          push();
-          rotate(-0.13);
-          ellipse(-10, -143, 15, 10);
-          pop();
-          push();
-          rotate(0.13);
-          ellipse(25, -143, 15, 10);
-          pop();
+          case 'angry':
+  // Boca enfadada
+  noFill();
+  stroke(strokeCol); strokeWeight(4);
+  arc(7, -100, 40, 25, PI + QUARTER_PI, TWO_PI - QUARTER_PI);
+
+  // Ojos más juntos
+  fill(0);
+  ellipse(-2, -140, 13, 13);   // Ojo izquierdo (más cerca del centro)
+  ellipse(16, -140, 13, 13);   // Ojo derecho (más cerca del centro)
+
+  // Cejas enfadadas
+  stroke(80, 30, 20); strokeWeight(6); noFill();
+  // Ceja izquierda (inclinada hacia abajo en el centro)
+  line(-10, -155, 3, -148);
+  // Ceja derecha (inclinada hacia abajo en el centro)
+  line(9, -148, 22, -155);
+  break;
           break;
         case 'surprised':
           // Boca redonda
