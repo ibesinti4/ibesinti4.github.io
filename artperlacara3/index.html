@@ -367,16 +367,121 @@
             // Omple la forma amb un groc clar. El valor 150 * smoothIntensity controla la transparència.
             beginShape();
             // Inicia la definició d'una forma complexa (múltiples punts)
-            for (let i = 0; i < 10; i++) {
-              // Bucle per generar 10 punts (vertex) al voltant d’un cercle
-              const angle = map(i, 0, 10, 0, TWO_PI);
-              // Converteix l'índex actual en un angle, repartint-los uniformement al voltant d’un cercle (de 0 a 2π)
-              const radius = baseSize * (0.8 + sin(t + angle * 2) * 0.2);
-              // Calcula el radi per cada punt, afegint una oscil·lació amb sin() per aconseguir un efecte ondulatori
-              vertex(centerX + cos(angle) * radius, centerY + sin(angle) * radius);
-              // Defineix un vertex de la forma convertint coordenades polars a cartesianes
-            }
-            endShape(CLOSE);
+           beginShape();//cuerpo 
+vertex(247, 743.1875);
+vertex(243, 726.1875);
+vertex(238, 707.1875);
+vertex(236, 681.1875);
+vertex(235, 658.1875);
+vertex(241, 637.1875);
+vertex(242, 617.1875);
+vertex(236, 606.1875);
+vertex(235, 589.1875);
+vertex(234, 570.1875);
+vertex(238, 555.1875);
+vertex(242, 545.1875);
+vertex(242, 530.1875);
+vertex(242, 518.1875);
+vertex(246, 504.1875);
+vertex(251, 489.1875);
+vertex(258, 477.1875);
+vertex(271, 473.1875);
+vertex(277, 462.1875);
+vertex(274, 452.1875);
+vertex(266, 439.1875);
+vertex(262, 426.1875);
+vertex(261, 412.1875);
+vertex(261, 399.1875);
+vertex(269, 394.1875);
+vertex(272, 402.1875);
+vertex(278, 391.1875);
+vertex(284, 379.1875);
+vertex(292, 373.1875);
+vertex(301, 365.1875);
+vertex(311, 364.1875);
+vertex(323, 364.1875);
+vertex(334, 365.1875);
+vertex(340, 369.1875);
+vertex(348, 375.1875);
+vertex(356, 381.1875);
+vertex(359, 391.1875);
+vertex(364, 390.1875);
+vertex(366, 399.1875);
+vertex(367, 407.1875);
+vertex(370, 421.1875);
+vertex(370, 433.1875);
+vertex(363, 442.1875);
+vertex(359, 450.1875);
+vertex(354, 464.1875);
+vertex(354, 475.1875);
+vertex(356, 487.1875);
+vertex(361, 499.1875);
+vertex(366, 507.1875);
+vertex(373, 524.1875);
+vertex(377, 535.1875);
+vertex(377, 548.1875);
+vertex(377, 564.1875);
+vertex(376, 579.1875);
+vertex(373, 592.1875);
+vertex(361, 598.1875);
+vertex(354, 599.1875);
+vertex(341, 594.1875);
+vertex(337, 605.1875);
+vertex(334, 618.1875);
+vertex(331, 630.1875);
+vertex(326, 646.1875);
+vertex(323, 660.1875);
+vertex(323, 674.1875);
+vertex(323, 683.1875);
+vertex(324, 696.1875);
+vertex(328, 713.1875);
+vertex(335, 721.1875);
+vertex(341, 732.1875);
+vertex(348, 740.1875);
+vertex(294, 742.1875);
+vertex(248, 741.1875);
+vertex(248, 741.1875);
+vertex(248, 741.1875);
+vertex(248, 741.1875);
+vertex(248, 741.1875);
+vertex(249, 741.1875)
+    endShape(Close);
+          //boca
+    beginShape();
+vertex(308, 452.1875);
+vertex(315, 453.1875);
+vertex(321, 451.1875);
+vertex(328, 449.1875);
+vertex(327, 455.1875);
+vertex(324, 461.1875);
+vertex(318, 463.1875);
+vertex(311, 460.1875);
+vertex(307, 452.1875);
+   endShape(Close);
+   //Ojo izquierdo
+      beginShape();
+vertex(333, 407.1875);
+vertex(326, 411.1875);
+vertex(322, 416.1875);
+vertex(322, 421.1875);
+vertex(328, 423.1875);
+vertex(336, 423.1875);
+vertex(342, 417.1875);
+vertex(340, 410.1875);
+vertex(332, 407.1875);
+vertex(332, 407.1875);
+    endShape(Close);
+//Ojo derecho
+   beginShape();
+vertex(292, 406.1875);
+vertex(300, 406.1875);
+vertex(302, 410.1875);
+vertex(303, 416.1875);
+vertex(301, 422.1875);
+vertex(294, 421.1875);
+vertex(289, 416.1875);
+vertex(288, 409.1875);
+endShape(CLOSE);
             // Tanca la forma, connectant el darrer vertex amb el primer per completar el contorn
             break;
 
