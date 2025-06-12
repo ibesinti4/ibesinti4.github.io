@@ -1,343 +1,179 @@
+<!DOCTYPE html>
 <html lang="ca">
 <head>
   <meta charset="UTF-8">
-  <title>Art Geomètric Amb Expressió Facial</title>
-  <!-- Llibreria p5.js per fer gràfics interactius -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Art Facial Responsiu - Expressions Dinàmiques</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.11.3/p5.js"></script>
-  <!-- Llibreria ml5.js per reconeixement facial amb machine learning -->
   <script src="https://cdn.jsdelivr.net/gh/ml5js/Intro-ML-Arts-IMA@ml5-build-10-7-19/ml5_build/ml5.min.js"></script>
   <style>
-    /* Estil general del cos de la pàgina */
     body {
-      margin: 0; /* sense marges externs */
-      padding: 0; /* sense espais interns */
-      background-color: #f4f4f4; /* color de fons gris clar */
-      display: flex; /* fa servir flexbox per alinear */
-      justify-content: center; /* centra horitzontalment */
-      align-items: center; /* centra verticalment */
-      height: 100vh; /* alçada de tota la pantalla */
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #f0f0f0;
     }
-
-    /* Pantalla de càrrega quan els models encara es carreguen */
     #loading-screen {
-      position: fixed; /* fixa la posició a la pantalla */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.9); /* blanc amb transparència */
-      display: flex;
-      flex-direction: column; /* columna vertical */
-      justify-content: center;
-      align-items: center;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.95);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
       font-family: Arial, sans-serif;
-      font-size: 18px;
-      color: #333; /* gris fosc */
-      z-index: 10; /* per sobre de tot */
+      z-index: 1000;
     }
-
-    /* Rodona animada de càrrega */
     .loader {
-      width: 50px;
-      height: 50px;
-      border: 6px solid #3498db; /* blau */
-      border-top: 6px solid transparent;
+      width: 40px; height: 40px;
+      border: 5px solid #3498db;
+      border-top-color: transparent;
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin-bottom: 10px;
     }
-
-    /* Animació de gir */
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-screen p {
+      margin-top: 15px;
+      font-size: 1.1em;
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <!-- Div visible mentre es carreguen els models -->
   <div id="loading-screen">
     <div class="loader"></div>
-    <p>Carregant models, si us plau, espera...</p>
+    <p>Carregant models...</p>
   </div>
   <script>
-    // Variables globals
     let faceapi, detections = [], video;
-    let modelsMostrats = false;
+    let modelsReady = false;
+    let currentExpression = { dominant: 'neutral', intensity: 0 };
+    let smoothIntensity = 0;
+    let currentGradientStart, currentGradientEnd;
+    let targetGradientStart, targetGradientEnd;
 
-    // Mida virtual que es manté proporcional a qualsevol pantalla
-    const VIRTUAL_W = 600;
-    const VIRTUAL_H = 746
-      ;
+    function getGradientForEmotion(emotion) {
+      switch (emotion) {
+        case 'happy':      return { start: color(255, 223, 186), end: color(255, 183, 77) };
+        case 'sad':        return { start: color(173, 216, 230), end: color(100, 149, 237) };
+        case 'angry':      return { start: color(255, 160, 122), end: color(255, 69, 0) };
+        case 'disgusted':  return { start: color(144, 238, 144), end: color(34, 139, 34) };
+        case 'surprised':  return { start: color(216, 191, 216), end: color(147, 112, 219) };
+        default:           return { start: color(240, 240, 240), end: color(200, 200, 200) };
+      }
+    }
 
-    // Funció que es crida al començar
+    function setGradient(x, y, w, h, c1, c2, axis = 'y') {
+      noFill();
+      if (axis === 'y') {
+        for (let i = y; i <= y + h; i++) {
+          let inter = map(i, y, y + h, 0, 1);
+          let c = lerpColor(c1, c2, inter);
+          stroke(c); line(x, i, x + w, i);
+        }
+      } else if (axis === 'x') {
+        for (let i = x; i <= x + w; i++) {
+          let inter = map(i, x, x + w, 0, 1);
+          let c = lerpColor(c1, c2, inter);
+          stroke(c); line(i, y, i, y + h);
+        }
+      }
+    }
+
     function setup() {
-      createCanvas(windowWidth, windowHeight); // crea una zona de dibuix de la mida de la finestra
-      video = createCapture(VIDEO);            // activa la webcam
-      video.size(480, 480);                    // estableix la mida del vídeo
-      video.hide();                            // amaga el vídeo per defecte
-
-      // Configura els paràmetres del reconeixement facial
+      createCanvas(windowWidth, windowHeight);
+      let neutralGrad = getGradientForEmotion('neutral');
+      currentGradientStart = neutralGrad.start;
+      currentGradientEnd = neutralGrad.end;
+      video = createCapture(VIDEO);
+      video.size(320, 240);
+      video.hide();
+      video.elt.muted = true;
+      video.elt.playsinline = true;
       const options = {
         withLandmarks: true,
         withExpressions: true,
         withDescriptors: false
       };
-      faceapi = ml5.faceApi(video, options, modelReady); // inicialitza el model amb la webcam
+      faceapi = ml5.faceApi(video, options, () => {
+        modelsReady = true;
+        document.getElementById('loading-screen').style.display = 'none';
+        faceapi.detect(gotResults);
+      });
     }
 
-    // Redimensiona el canvas si canvia la mida de la finestra
     function windowResized() {
       resizeCanvas(windowWidth, windowHeight);
+      video.size(max(160, width / 4), max(120, height / 4));
     }
 
-    // Quan el model està carregat correctament
-    function modelReady() {
-      faceapi.detect(gotResults); // comença a detectar cares
-    }
-
-    // Quan hi ha resultats del model
-    function gotResults(err, result) {
-      if (err) return console.error(err); // mostra error si hi ha
-      detections = result; // desa les dades de la detecció
-      if (!modelsMostrats) {
-        document.getElementById("loading-screen").style.display = "none";
-        modelsMostrats = true;
+    function gotResults(err, results) {
+      if (err) {
+        console.error(err);
+        document.getElementById('loading-screen').innerHTML =
+          '<p style="color: red">Error! Comprova la càmera i actualitza.</p>';
+        return;
       }
-      faceapi.detect(gotResults); // torna a detectar de forma continua
+      detections = results;
+      if (detections.length > 0) updateCurrentExpression();
+      faceapi.detect(gotResults);
     }
 
-    // Funció de dibuix
+    function updateCurrentExpression() {
+      let maxIntensity = 0;
+      detections.forEach(face => {
+        const expr = face.expressions;
+        const dominant = Object.keys(expr).reduce((a, b) => expr[a] > expr[b] ? a : b);
+        if (expr[dominant] > maxIntensity) {
+          currentExpression = { dominant: dominant, intensity: expr[dominant] };
+          maxIntensity = expr[dominant];
+        }
+      });
+      let grad = getGradientForEmotion(currentExpression.dominant);
+      targetGradientStart = grad.start;
+      targetGradientEnd = grad.end;
+    }
+
     function draw() {
-      background(255); // fons blanc
-
-      // Inicialitzem l'estat emocional detectat
-      let dominant = "neutral", intensity = 0;
-      if (detections.length > 0) {
-        let expr = detections[0].expressions;
-        dominant = Object.keys(expr).reduce((a, b) => expr[a] > expr[b] ? a : b);
-        intensity = expr[dominant];
+      smoothIntensity = lerp(smoothIntensity, currentExpression.intensity, 0.1);
+      if (targetGradientStart && targetGradientEnd) {
+        currentGradientStart = lerpColor(currentGradientStart, targetGradientStart, 0.1);
+        currentGradientEnd = lerpColor(currentGradientEnd, targetGradientEnd, 0.1);
       }
-
-      // Calcular escala i marges per centrar el dibuix virtual a la pantalla
-      let scaleFactor = min(width / VIRTUAL_W, height / VIRTUAL_H);
-      let offsetX = (width - VIRTUAL_W * scaleFactor) / 2;
-      let offsetY = (height - VIRTUAL_H * scaleFactor) / 2;
-
-      // Aplicar transformacions per mantenir el dibuix centrat i escalat
-      push(); // desa l'estat de transformació
-      translate(offsetX, offsetY); // desplaça l'origen
-      scale(scaleFactor); // redimensiona proporcionalment
-      drawArt(dominant, intensity); // dibuixa la figura segons l'expressió
-      pop(); // recupera l'estat anterior
-
-      // Mostra el text amb l'expressió dominant (fora de transformacions)
-      noStroke();
-      fill(44,169,225);
-      textSize(12);
-      textAlign(CENTER, TOP);
-      text("Expressió: " + dominant, width / 2-100, -10);
-      textSize(28);
-      text("Intensitat: " + Math.round(intensity * 100)+"%",width /2+100,10);
-      // Mostra el vídeo si hi ha detecció
-      if (detections.length > 0) {
-        image(video, width - 140, height - 140, 120, 120);
-      }
+      setGradient(0, 0, width, height, currentGradientStart, currentGradientEnd, 'y');
+      push();
+      translate(width / 2, height / 2);
+      const scaleFactor = min(width, height) / 800;
+      scale(scaleFactor);
+      drawArt();
+      pop();
+      drawHUD();
+      // No preview en la esquina
     }
 
-    // Dibuixa diferents figures depenent de l'estat emocional
-    function drawArt(dominant, intensity) {
-      noFill();
-      strokeWeight(4);
-
-      switch (dominant) {
-        case 'happy':
-          stroke(255,200,0); // groc
-          beginShape();//cuerpo 
-vertex(247, 743.1875);
-vertex(243, 726.1875);
-vertex(238, 707.1875);
-vertex(236, 681.1875);
-vertex(235, 658.1875);
-vertex(241, 637.1875);
-vertex(242, 617.1875);
-vertex(236, 606.1875);
-vertex(235, 589.1875);
-vertex(234, 570.1875);
-vertex(238, 555.1875);
-vertex(242, 545.1875);
-vertex(242, 530.1875);
-vertex(242, 518.1875);
-vertex(246, 504.1875);
-vertex(251, 489.1875);
-vertex(258, 477.1875);
-vertex(271, 473.1875);
-vertex(277, 462.1875);
-vertex(274, 452.1875);
-vertex(266, 439.1875);
-vertex(262, 426.1875);
-vertex(261, 412.1875);
-vertex(261, 399.1875);
-vertex(269, 394.1875);
-vertex(272, 402.1875);
-vertex(278, 391.1875);
-vertex(284, 379.1875);
-vertex(292, 373.1875);
-vertex(301, 365.1875);
-vertex(311, 364.1875);
-vertex(323, 364.1875);
-vertex(334, 365.1875);
-vertex(340, 369.1875);
-vertex(348, 375.1875);
-vertex(356, 381.1875);
-vertex(359, 391.1875);
-vertex(364, 390.1875);
-vertex(366, 399.1875);
-vertex(367, 407.1875);
-vertex(370, 421.1875);
-vertex(370, 433.1875);
-vertex(363, 442.1875);
-vertex(359, 450.1875);
-vertex(354, 464.1875);
-vertex(354, 475.1875);
-vertex(356, 487.1875);
-vertex(361, 499.1875);
-vertex(366, 507.1875);
-vertex(373, 524.1875);
-vertex(377, 535.1875);
-vertex(377, 548.1875);
-vertex(377, 564.1875);
-vertex(376, 579.1875);
-vertex(373, 592.1875);
-vertex(361, 598.1875);
-vertex(354, 599.1875);
-vertex(341, 594.1875);
-vertex(337, 605.1875);
-vertex(334, 618.1875);
-vertex(331, 630.1875);
-vertex(326, 646.1875);
-vertex(323, 660.1875);
-vertex(323, 674.1875);
-vertex(323, 683.1875);
-vertex(324, 696.1875);
-vertex(328, 713.1875);
-vertex(335, 721.1875);
-vertex(341, 732.1875);
-vertex(348, 740.1875);
-vertex(294, 742.1875);
-vertex(248, 741.1875);
-vertex(248, 741.1875);
-vertex(248, 741.1875);
-vertex(248, 741.1875);
-vertex(248, 741.1875);
-vertex(249, 741.1875)
-    endShape(Close);
-          //boca
-    beginShape();
-vertex(308, 452.1875);
-vertex(315, 453.1875);
-vertex(321, 451.1875);
-vertex(328, 449.1875);
-vertex(327, 455.1875);
-vertex(324, 461.1875);
-vertex(318, 463.1875);
-vertex(311, 460.1875);
-vertex(307, 452.1875);
-   endShape(Close);
-   //Ojo izquierdo
+    // ----------- Dibujo del contorno (cabeza/cara) -----------
+    function drawFaceOutline() {
       beginShape();
-vertex(333, 407.1875);
-vertex(326, 411.1875);
-vertex(322, 416.1875);
-vertex(322, 421.1875);
-vertex(328, 423.1875);
-vertex(336, 423.1875);
-vertex(342, 417.1875);
-vertex(340, 410.1875);
-vertex(332, 407.1875);
-vertex(332, 407.1875);
-    endShape(Close);
-//Ojo derecho
-   beginShape();
-vertex(292, 406.1875);
-vertex(300, 406.1875);
-vertex(302, 410.1875);
-vertex(303, 416.1875);
-vertex(301, 422.1875);
-vertex(294, 421.1875);
-vertex(289, 416.1875);
-vertex(288, 409.1875);
-endShape(CLOSE);
-          break;
-
-        case 'sad':
-          stroke(50,100,200,150); // blau
-          beginShape();
-          for (let x = 0; x <= 400; x += 40)
-            vertex(200 + x, 300 + 100 * intensity);
-          for (let x = 400; x >= 0; x -= 40)
-            vertex(200 + x, 300 - 50 * intensity);
-          endShape(CLOSE);
-          break;
-
-        case 'angry':
-          stroke(200,0,0,150); // vermell
-          beginShape();
-          for (let i = 0; i < 16; i++) {
-            let angle = map(i, 0, 16, 0, TWO_PI);
-            let r = i % 2 ? 100 : 175;
-            let x = VIRTUAL_W/2 + r * cos(angle);
-            let y = VIRTUAL_H/2 + r * sin(angle);
-            vertex(x, y);
-          }
-          endShape(CLOSE);
-          break;
-
-        case 'fearful':
-          stroke(100,100,100,150); // gris
-          beginShape();
-          for (let x = 0; x <= VIRTUAL_W; x += 10) {
-            let y = VIRTUAL_H/2 + 50 * sin((x - VIRTUAL_W/2) * 0.05) * intensity;
-            vertex(x, y);
-          }
-          endShape();
-          break;
-
-        case 'surprised':
-          stroke(0,150,255,150); // blau clar
-          beginShape();
-          for (let i = 0; i < 20; i++) {
-            let angle = random(TWO_PI);
-            let r = 50 + 100 * intensity;
-            let x = VIRTUAL_W/2 + r * cos(angle);
-            let y = VIRTUAL_H/2 + r * sin(angle);
-            vertex(x, y);
-          }
-          endShape(CLOSE);
-          break;
-
-        case 'disgusted':
-          stroke(0,150,0,150); // verd
-          beginShape();
-          for (let i = 0; i < 12; i++) {
-            let angle = map(i, 0, 12, 0, TWO_PI);
-            let r = 75 + random(-50, 50) * intensity;
-            let x = VIRTUAL_W/2 + r * cos(angle);
-            let y = VIRTUAL_H/2 + r * sin(angle);
-            vertex(x, y);
-          }
-          endShape(CLOSE);
-          break;
-
-        default:
-          stroke(150,150,150,150); // gris suau
-          beginShape();
-          vertex(0, 0);
-          vertex(VIRTUAL_W, 0);
-          vertex(VIRTUAL_W, VIRTUAL_H);
-          vertex(0, VIRTUAL_H);
-          endShape(CLOSE);
-      }
+      vertex(-59, 189.6875); vertex(-63, 172.6875); vertex(-68, 153.6875); vertex(-70, 127.6875);
+      vertex(-71, 104.6875); vertex(-65, 83.6875); vertex(-64, 63.6875); vertex(-70, 52.6875);
+      vertex(-71, 35.6875); vertex(-72, 16.6875); vertex(-68, 1.6875); vertex(-64, -8.3125);
+      vertex(-64, -23.3125); vertex(-64, -35.3125); vertex(-60, -49.3125); vertex(-55, -64.3125);
+      vertex(-48, -76.3125); vertex(-35, -80.3125); vertex(-29, -91.3125); vertex(-32, -101.3125);
+      vertex(-40, -114.3125); vertex(-44, -127.3125); vertex(-45, -141.3125); vertex(-45, -154.3125);
+      vertex(-37, -159.3125); vertex(-34, -151.3125); vertex(-28, -162.3125); vertex(-22, -174.3125);
+      vertex(-14, -180.3125); vertex(-5, -188.3125); vertex(5, -189.3125); vertex(17, -189.3125);
+      vertex(28, -188.3125); vertex(34, -184.3125); vertex(42, -178.3125); vertex(50, -172.3125);
+      vertex(53, -162.3125); vertex(58, -163.3125); vertex(60, -154.3125); vertex(61, -146.3125);
+      vertex(64, -132.3125); vertex(64, -120.3125); vertex(57, -111.3125); vertex(53, -103.3125);
+      vertex(48, -89.3125); vertex(48, -78.3125); vertex(50, -66.3125); vertex(55, -54.3125);
+      vertex(60, -46.3125); vertex(67, -29.3125); vertex(71, -18.3125); vertex(71, -5.3125);
+      vertex(71, 10.6875); vertex(70, 25.6875); vertex(67, 38.6875); vertex(55, 44.6875);
+      vertex(48, 45.6875); vertex(35, 40.6875); vertex(31, 51.6875); vertex(28, 64.6875);
+      vertex(25, 76.6875); vertex(20, 92.6875); vertex(17, 106.6875); vertex(17, 120.6875);
+      vertex(17, 129.6875); vertex(18, 142.6875); vertex(22, 159.6875); vertex(29, 167.6875);
+      vertex(35, 178.6875); vertex(42, 186.6875); vertex(-12, 188.6875); vertex(-58, 187.6875);
+      endShape(CLOSE);
     }
-  </script>
-</body>
+
+    // ----------- Dibujo de la figura centrada y expresión según emoción 
+
+
+
